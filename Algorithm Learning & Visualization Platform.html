@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlgoMaster 7 - Complete Student Learning & Visualizer Studio</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7'
+            },
+            dark: {
+              950: '#050811',
+              900: '#0b1120',
+              850: '#11192e',
+              800: '#19243f',
+              750: '#233256',
+              700: '#2d3f6d'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Modern sleek scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #050811; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+
+    /* Visualizer Bar & Card Animations */
+    .bar-anim {
+      transition: height 0.1s ease, background-color 0.12s ease, transform 0.1s ease, opacity 0.15s ease;
+    }
+    .search-card-anim {
+      transition: all 0.15s ease;
+    }
+
+    /* Glow Highlights */
+    .glow-cyan { box-shadow: 0 0 16px rgba(56, 189, 248, 0.7); }
+    .glow-amber { box-shadow: 0 0 16px rgba(251, 191, 36, 0.75); }
+    .glow-rose { box-shadow: 0 0 16px rgba(244, 63, 94, 0.85); }
+    .glow-emerald { box-shadow: 0 0 18px rgba(52, 211, 153, 0.85); }
+    .glow-purple { box-shadow: 0 0 16px rgba(168, 85, 247, 0.75); }
+
+    /* Active Step Line Highlight in Pseudocode */
+    .code-active-step {
+      background-color: rgba(14, 165, 233, 0.28) !important;
+      border-left: 4px solid #38bdf8 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    /* Range slider custom thumb */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #1e293b;
+      border-radius: 9999px;
+      height: 6px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
+      transition: transform 0.12s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.3);
+    }
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <header class="border-b border-dark-700/80 bg-dark-900/90 backdrop-blur-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3 select-none">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
+          <i class="fa-solid fa-graduation-cap text-white text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent">
+              AlgoMaster 7
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 font-mono border border-cyan-500/20 uppercase tracking-wider font-bold">Student Learning Studio</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium hidden sm:block">7 Fundamental Algorithms • Crystal Clear Concepts & Live Visualizer</p>
+        </div>
+      </div>
+
+      <!-- Quick Audio, Language & Theme Controls -->
+      <div class="flex items-center space-x-2.5">
+        <!-- Language Toggle -->
+        <button id="langToggleBtn" class="px-3 py-1.5 rounded-xl border border-dark-700 bg-dark-850 hover:bg-dark-800 text-slate-200 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Toggle English / Bilingual (English + Hindi)">
+          <i class="fa-solid fa-language text-cyan-400"></i>
+          <span id="langModeText">Bilingual (हिन्दी + Eng)</span>
+        </button>
+
+        <!-- Sound Toggle -->
+        <button id="soundToggleBtn" class="px-3 py-1.5 rounded-xl border border-dark-700 bg-dark-850 hover:bg-dark-800 text-slate-300 text-xs font-semibold transition flex items-center gap-2 shadow-sm">
+          <span id="soundDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span id="soundLabel">Sound: ON</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <div class="bg-dark-900/80 border-b border-dark-700/60 sticky top-16 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex space-x-2 py-2.5 overflow-x-auto no-scrollbar text-xs font-semibold select-none" id="algoNavTabs">
+        <!-- 2 Searching Algorithms -->
+        <div class="flex items-center gap-1.5 pr-2 border-r border-dark-700/70">
+          <span class="text-[10px] uppercase tracking-wider text-slate-400 font-mono pl-1 flex items-center gap-1">
+            <i class="fa-solid fa-magnifying-glass text-cyan-400 text-[9px]"></i> Search:
+          </span>
+          <button class="algo-pill-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition text-slate-400 hover:text-white" data-algo="linear">
+            <span>1. Linear Search</span>
+          </button>
+          <button class="algo-pill-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition text-slate-400 hover:text-white" data-algo="binary">
+            <span>2. Binary Search</span>
+          </button>
+        </div>
+
+        <!-- 5 Sorting Algorithms -->
+        <div class="flex items-center gap-1.5 pl-2">
+          <span class="text-[10px] uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1">
+            <i class="fa-solid fa-arrow-down-short-wide text-amber-400 text-[9px]"></i> Sort:
+          </span>
+          <button class="algo-pill-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition bg-cyan-500 text-dark-950 font-bold shadow-md shadow-cyan-500/25 active" data-algo="bubble">
+            <span>3. Bubble Sort</span>
+          </button>
+          <button class="algo-pill-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition text-slate-400 hover:text-white" data-algo="selection">
+            <span>4. Selection Sort</span>
+          </button>
+          <button class="algo-pill-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition text-slate-400 hover:text-white" data-algo="insertion">
+            <span>5. Insertion Sort <span class="text-[9px] opacity-75 font-normal">('Intersection')</span></span>
+          </button>
+          <button class="algo-pill-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition text-slate-400 hover:text-white" data-algo="quick">
+            <span>6. Quick Sort</span>
+          </button>
+          <button class="algo-pill-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition text-slate-400 hover:text-white" data-algo="merge">
+            <span>7. Merge Sort</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+
+    <!-- 1. EDUCATIONAL THEORY, ACCURATE DEFINITION & REAL-WORLD ANALOGY CARD -->
+    <section class="bg-dark-900 border border-dark-700/80 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+      <!-- Title & Complexity Badges Header -->
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-4 border-b border-dark-700/60">
+        <div>
+          <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <span id="algoCategoryBadge" class="px-2.5 py-0.5 rounded-md bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 text-xs font-mono font-bold uppercase tracking-wider">
+              Sorting Algorithm
+            </span>
+            <h1 id="algoTitle" class="text-2xl sm:text-3xl font-black text-white">Bubble Sort</h1>
+            <span id="algoHindiNote" class="text-xs text-amber-300 font-mono font-medium">(बबल सॉर्ट)</span>
+          </div>
+          <p id="algoSubtitle" class="text-sm text-slate-300">Repeatedly compares adjacent items and swaps them if they are in wrong order.</p>
+        </div>
+
+        <!-- Complexity Quick Matrix -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="bg-dark-850 px-3 py-1.5 rounded-xl border border-dark-700 text-center min-w-[72px]">
+            <span class="text-[10px] text-slate-400 uppercase font-mono block">Best Time</span>
+            <span id="badgeBest" class="text-emerald-400 font-bold font-mono text-xs">O(n)</span>
+          </div>
+          <div class="bg-dark-850 px-3 py-1.5 rounded-xl border border-dark-700 text-center min-w-[72px]">
+            <span class="text-[10px] text-slate-400 uppercase font-mono block">Avg Time</span>
+            <span id="badgeAvg" class="text-amber-400 font-bold font-mono text-xs">O(n²)</span>
+          </div>
+          <div class="bg-dark-850 px-3 py-1.5 rounded-xl border border-dark-700 text-center min-w-[72px]">
+            <span class="text-[10px] text-slate-400 uppercase font-mono block">Worst Time</span>
+            <span id="badgeWorst" class="text-rose-400 font-bold font-mono text-xs">O(n²)</span>
+          </div>
+          <div class="bg-dark-850 px-3 py-1.5 rounded-xl border border-dark-700 text-center min-w-[72px]">
+            <span class="text-[10px] text-slate-400 uppercase font-mono block">Space</span>
+            <span id="badgeSpace" class="text-purple-400 font-bold font-mono text-xs">O(1)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theory and Real-World Analogy 3-Card Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        
+        <!-- Definition Box -->
+        <div class="bg-dark-850/90 p-4 rounded-xl border border-dark-700/70 flex flex-col gap-2">
+          <h2 class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark"></i>
+            <span>Accurate Definition (सटीक परिभाषा)</span>
+          </h2>
+          <p id="algoDefinitionEn" class="text-xs text-slate-200 leading-relaxed font-normal">
+            Bubble sort steps through the list, compares neighboring pairs, and swaps them if they are in the inverted order. In each pass, the highest remaining number floats to the correct position at the end.
+          </p>
+          <div id="algoDefinitionHiContainer" class="mt-1 pt-2 border-t border-dark-700/50 text-xs text-slate-300">
+            <strong class="text-cyan-300">हिंदी में समझें:</strong>
+            <p id="algoDefinitionHi" class="mt-0.5 leading-relaxed text-slate-300">पास में स्थित दोनों एलिमेंट्स की तुलना होती है; अगर पहला बड़ा हो तो आपस में बदल देते हैं। हर चक्कर के बाद सबसे बड़ा तत्व अंत में पहुँच जाता है।</p>
+          </div>
+        </div>
+
+        <!-- Real-World Analogy -->
+        <div class="bg-dark-850/90 p-4 rounded-xl border border-dark-700/70 flex flex-col gap-2">
+          <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span>Real-World Example (दैनिक जीवन का उदाहरण)</span>
+          </h2>
+          <p id="algoExampleEn" class="text-xs text-slate-200 leading-relaxed">
+            Arranging students in morning school assembly by height. The teacher walks from front to back, comparing adjacent students and swapping them if the front child is taller. After round one, the tallest child is guaranteed at the back!
+          </p>
+          <div id="algoExampleHiContainer" class="mt-1 pt-2 border-t border-dark-700/50 text-xs text-slate-300">
+            <strong class="text-amber-300">आसान उदाहरण:</strong>
+            <p id="algoExampleHi" class="mt-0.5 leading-relaxed text-slate-300">सुबह स्कूल प्रार्थना में बच्चों को हाइट के अनुसार खड़ा करना। टीचर आगे से पीछे जाते हुए दो-दो बच्चों की हाइट देखती है और बड़े बच्चे को पीछे कर देती है।</p>
+          </div>
+        </div>
+
+        <!-- How It Works (Step-by-Step Mechanism) -->
+        <div class="bg-dark-850/90 p-4 rounded-xl border border-dark-700/70 flex flex-col gap-2">
+          <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-list-ol"></i>
+            <span>Step-by-Step Logic (कार्यप्रणाली)</span>
+          </h2>
+          <ol id="algoStepsList" class="text-xs text-slate-300 space-y-1 list-decimal list-inside leading-relaxed">
+            <!-- Populated via JS -->
+          </ol>
+          <div class="mt-auto pt-2 border-t border-dark-700/50 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+            <span>Stability: <strong id="algoStability" class="text-emerald-400">Yes</strong></span>
+            <span>In-Place: <strong id="algoInPlace" class="text-cyan-400">Yes</strong></span>
+            <span>Paradigm: <strong id="algoParadigm" class="text-indigo-300">Comparison</strong></span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Complexity "Why?" Explanation Banner for Exam Students -->
+      <div class="mt-4 p-3 rounded-xl bg-dark-950/70 border border-dark-700/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2 text-indigo-300">
+          <i class="fa-solid fa-circle-question text-cyan-400"></i>
+          <span class="font-bold">Exam Note (यह कॉम्प्लेक्सिटी क्यों है?):</span>
+        </div>
+        <span id="algoWhyComplexity" class="text-slate-300 flex-1 sm:ml-2">
+          Average and worst case is O(n²) because for 'n' elements, we perform approx n*(n-1)/2 comparisons. Best case is O(n) if already sorted (when optimized with a swapped flag).
+        </span>
+      </div>
+    </section>
+
+    <section class="bg-dark-900 border border-dark-700/70 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col gap-4">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+        
+        <!-- Presets / Shuffles (Left) -->
+        <div class="lg:col-span-4 flex items-center gap-2 flex-wrap">
+          <button id="btnRandomize" class="px-3 py-2 rounded-xl bg-dark-850 hover:bg-dark-800 border border-dark-700 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-shuffle text-cyan-400"></i> Random
+          </button>
+          <button id="btnReversed" class="px-3 py-2 rounded-xl bg-dark-850 hover:bg-dark-800 border border-dark-700 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5" title="Worst case for Bubble, Insertion, Selection">
+            <i class="fa-solid fa-arrow-down-wide-short text-rose-400"></i> Reversed (Worst)
+          </button>
+          <button id="btnNearlySorted" class="px-3 py-2 rounded-xl bg-dark-850 hover:bg-dark-800 border border-dark-700 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5" title="Nearly sorted / Best case test">
+            <i class="fa-solid fa-arrow-up-short-wide text-emerald-400"></i> Nearly Sorted
+          </button>
+        </div>
+
+        <!-- Sliders: Array Size & Execution Speed (Center) -->
+        <div class="lg:col-span-4 grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1">
+            <div class="flex justify-between items-center text-xs font-semibold text-slate-400">
+              <span>Size: <span id="labelArraySize" class="text-cyan-400 font-mono">16</span></span>
+            </div>
+            <input id="sliderArraySize" type="range" min="6" max="32" value="16" class="w-full mt-1 cursor-pointer">
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <div class="flex justify-between items-center text-xs font-semibold text-slate-400">
+              <span>Speed: <span id="labelSpeed" class="text-indigo-400 font-mono">120ms</span></span>
+            </div>
+            <input id="sliderSpeed" type="range" min="20" max="600" value="120" class="w-full mt-1 cursor-pointer" style="direction: rtl;">
+          </div>
+        </div>
+
+        <!-- Play / Pause / Step Controls (Right) -->
+        <div class="lg:col-span-4 flex items-center justify-start lg:justify-end gap-2 flex-wrap">
+          <button id="btnReset" class="px-3.5 py-2.5 rounded-xl bg-dark-850 hover:bg-dark-800 border border-dark-700 text-xs font-semibold text-slate-300 flex items-center gap-1.5 transition active:scale-95" title="Reset array state">
+            <i class="fa-solid fa-rotate-left text-slate-400"></i>
+            <span>Reset</span>
+          </button>
+
+          <button id="btnStep" class="px-3.5 py-2.5 rounded-xl bg-dark-850 hover:bg-dark-800 border border-dark-700 text-xs font-semibold text-amber-400 flex items-center gap-1.5 transition active:scale-95" title="Advance one step">
+            <i class="fa-solid fa-forward-step"></i>
+            <span>Step</span>
+          </button>
+
+          <button id="btnPlay" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-dark-950 text-xs font-black shadow-lg shadow-cyan-500/25 transition active:scale-95 flex items-center gap-2">
+            <span id="playIcon">
+              <i class="fa-solid fa-play"></i>
+            </span>
+            <span id="playText">Start Visualize</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Search Target Input & Custom Array Input -->
+      <div class="pt-3 border-t border-dark-700/60 flex items-center gap-3 flex-wrap text-xs">
+        
+        <!-- Searching Target Input (visible on linear/binary) -->
+        <div id="searchTargetBox" class="hidden items-center gap-2">
+          <span class="text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1">
+            <i class="fa-solid fa-bullseye text-amber-400"></i> Target Value:
+          </span>
+          <input id="inputSearchTarget" type="number" value="42" class="w-20 bg-dark-850 border border-dark-700 rounded-lg px-2.5 py-1.5 font-mono text-cyan-300 focus:outline-none focus:ring-1 focus:ring-cyan-500 text-center font-bold">
+          <button id="btnPickRandomTarget" class="px-2.5 py-1.5 rounded-lg bg-dark-800 text-slate-300 hover:bg-dark-750 font-semibold border border-dark-700">Pick from Array</button>
+        </div>
+
+        <!-- Custom Array Input -->
+        <div class="flex-1 flex items-center gap-2 min-w-[280px]">
+          <span class="text-slate-400 font-semibold uppercase tracking-wider whitespace-nowrap">Custom Array:</span>
+          <input id="inputCustomArray" type="text" placeholder="e.g. 45, 12, 89, 34, 67, 23, 9, 78" class="flex-1 bg-dark-850 border border-dark-700 rounded-lg px-3 py-1.5 font-mono text-cyan-300 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 text-xs">
+          <button id="btnApplyCustomArray" class="px-3.5 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 font-semibold whitespace-nowrap transition">Apply</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-dark-900 border border-dark-700/70 rounded-xl p-3 flex flex-col">
+        <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-code-compare text-cyan-400 text-[11px]"></i> Comparisons
+        </span>
+        <span id="metricComparisons" class="text-2xl font-bold font-mono text-cyan-400">0</span>
+      </div>
+      <div class="bg-dark-900 border border-dark-700/70 rounded-xl p-3 flex flex-col">
+        <span id="metricSecondaryLabel" class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-right-left text-rose-400 text-[11px]"></i> Swaps / Writes
+        </span>
+        <span id="metricSwaps" class="text-2xl font-bold font-mono text-rose-400">0</span>
+      </div>
+      <div class="bg-dark-900 border border-dark-700/70 rounded-xl p-3 flex flex-col">
+        <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-database text-indigo-400 text-[11px]"></i> Array Accesses
+        </span>
+        <span id="metricAccesses" class="text-2xl font-bold font-mono text-indigo-400">0</span>
+      </div>
+      <div class="bg-dark-900 border border-dark-700/70 rounded-xl p-3 flex flex-col">
+        <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-stopwatch text-amber-400 text-[11px]"></i> Elapsed Time
+        </span>
+        <span id="metricTime" class="text-2xl font-bold font-mono text-amber-400">0ms</span>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      
+      <!-- Visualizer Graph / Canvas (Left) -->
+      <div class="lg:col-span-7 bg-dark-900 border border-dark-700/70 rounded-2xl p-5 flex flex-col relative overflow-hidden min-h-[420px] shadow-xl">
+        
+        <!-- Legend Indicator Tags -->
+        <div class="flex items-center gap-3 text-xs font-medium text-slate-400 mb-4 pb-2 border-b border-dark-700/50 flex-wrap">
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-cyan-500/80"></span> Default / Unvisited</div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-400"></span> Comparing / Target Check</div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-500"></span> Swapping / Writing</div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-purple-500"></span> Pivot / Mid Pointer</div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-400"></span> Sorted / Found</div>
+        </div>
+
+        <!-- Dynamic Visualization Array Canvas -->
+        <div id="visualizerCanvas" class="flex-1 w-full flex items-end justify-center gap-1 px-1 py-4 overflow-hidden relative">
+          <!-- Populated dynamically via JS for both Sorting & Searching -->
+        </div>
+
+        <!-- Success Complete Banner Overlay -->
+        <div id="completeBanner" class="hidden absolute top-16 inset-x-0 mx-auto w-fit px-5 py-2 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 rounded-full text-xs font-semibold backdrop-blur-md items-center gap-2 glow-emerald z-20">
+          <i class="fa-solid fa-circle-check text-emerald-400"></i>
+          <span id="completeBannerText">Algorithm Completed Successfully!</span>
+        </div>
+
+        <!-- Live Step Commentary Bar -->
+        <div class="mt-3 pt-3 border-t border-dark-700/60 flex items-center justify-between text-xs text-slate-300 bg-dark-950/60 px-3 py-2 rounded-xl">
+          <div class="flex items-center gap-2 truncate">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <span class="font-mono text-cyan-200 truncate" id="stepCommentary">Ready. Press 'Start Visualize' or 'Step' to begin.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Source Code & Pseudocode View (Right) -->
+      <div class="lg:col-span-5 flex flex-col gap-4">
+        <div class="bg-dark-900 border border-dark-700/70 rounded-2xl p-4 flex flex-col flex-1 shadow-xl">
+          
+          <!-- Code Language Switcher Tabs -->
+          <div class="flex items-center justify-between pb-3 border-b border-dark-700/60 mb-2 flex-wrap gap-2">
+            <div class="flex items-center gap-1 bg-dark-850 p-1 rounded-lg border border-dark-700 text-xs" id="codeLangTabs">
+              <button class="code-tab-btn px-2.5 py-1 rounded bg-cyan-500 text-dark-950 font-bold" data-lang="pseudo">Pseudocode</button>
+              <button class="code-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white" data-lang="cpp">C++</button>
+              <button class="code-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white" data-lang="python">Python</button>
+              <button class="code-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white" data-lang="java">Java</button>
+              <button class="code-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white" data-lang="js">JavaScript</button>
+            </div>
+
+            <button id="btnCopyCode" class="px-2.5 py-1 rounded-lg bg-dark-850 hover:bg-dark-800 border border-dark-700 text-xs text-slate-300 flex items-center gap-1.5 transition">
+              <i class="fa-regular fa-clone text-cyan-400"></i>
+              <span id="copyBtnText">Copy</span>
+            </button>
+          </div>
+
+          <!-- Code Box with Live Line Highlighting -->
+          <div id="codeDisplayArea" class="bg-dark-950/90 rounded-xl p-3 font-mono text-xs text-slate-300 leading-relaxed overflow-x-auto border border-dark-700/50 flex-1 max-h-[380px]">
+            <!-- Rendered via JS -->
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    class WebSoundSynthesizer {
+      constructor() {
+        this.audioCtx = null;
+        this.enabled = true;
+      }
+      init() {
+        if (!this.audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.audioCtx = new AudioContext();
+        }
+        if (this.audioCtx.state === 'suspended') {
+          this.audioCtx.resume();
+        }
+      }
+      playPitch(freq, duration = 0.05, type = 'triangle', vol = 0.03) {
+        if (!this.enabled) return;
+        try {
+          this.init();
+          const osc = this.audioCtx.createOscillator();
+          const gain = this.audioCtx.createGain();
+
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+
+          gain.gain.setValueAtTime(vol, this.audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.audioCtx.currentTime + duration);
+
+          osc.connect(gain);
+          gain.connect(this.audioCtx.destination);
+
+          osc.start();
+          osc.stop(this.audioCtx.currentTime + duration);
+        } catch (e) {
+          // Audio gesture policy fallback
+        }
+      }
+      playElementTone(val, min = 10, max = 100) {
+        const freq = 180 + ((val - min) / (max - min || 1)) * 620;
+        this.playPitch(freq, 0.05, 'triangle', 0.025);
+      }
+      playSuccessChime() {
+        this.playPitch(523.25, 0.12, 'sine', 0.04);
+        setTimeout(() => this.playPitch(659.25, 0.14, 'sine', 0.04), 90);
+        setTimeout(() => this.playPitch(783.99, 0.2, 'sine', 0.04), 180);
+      }
+    }
+
+    const soundSynth = new WebSoundSynthesizer();
+  </script>
+
+  <script>
+    const ALGORITHMS_DATA = {
+      // 1. LINEAR SEARCH
+      linear: {
+        id: "linear",
+        title: "Linear Search",
+        hindiNote: "(लीनियर सर्च / क्रमिक खोज)",
+        category: "Searching Algorithm",
+        subtitle: "Sequentially checks each element in the list one by one until a match is found or the end is reached.",
+        definitionEn: "Linear Search is the simplest searching algorithm that checks every element in a list one by one from index 0 until the desired target is found or all elements have been scanned. It works seamlessly on both sorted and unsorted lists.",
+        definitionHi: "लीनियर सर्च सबसे सरल सर्चिंग तरीका है। इसमें हम पहले एलिमेंट (इंडेक्स 0) से शुरू करके एक-एक करके हर संख्या की तुलना अपने 'टारगेट' से करते हैं जब तक कि वह मिल न जाए या लिस्ट खत्म न हो जाए। यह बिना सॉर्ट की हुई लिस्ट पर भी काम करता है।",
+        exampleEn: "Looking for your lost house keys in a row of 10 jackets in a wardrobe. You check the pocket of the 1st jacket, then 2nd, then 3rd, sequentially until you find them!",
+        exampleHi: "अलमारी में टंगे 10 कोट में से अपनी खोई हुई चाबी ढूँढना। आप पहले कोट की जेब चेक करते हैं, फिर दूसरे की, फिर तीसरे की... जब तक चाबी मिल न जाए।",
+        steps: [
+          "Start at the very first element (index 0).",
+          "Compare the current element with the target value.",
+          "If current element == target, search is successful! Return its index.",
+          "If not equal, move forward to the next index.",
+          "If end of array is reached and target wasn't found, return -1."
+        ],
+        best: "O(1)",
+        avg: "O(n)",
+        worst: "O(n)",
+        space: "O(1)",
+        stability: "N/A",
+        inPlace: "Yes",
+        paradigm: "Sequential Scan",
+        whyComplexity: "Best case O(1) occurs when the target is at the very first index. Worst case O(n) occurs when the target is at the last index or completely absent.",
+        isSearch: true,
+        pseudo: [
+          "linearSearch(arr, target):",
+          "  for i = 0 to length(arr) - 1:",
+          "    if arr[i] == target:",
+          "      return i // Element found at index i",
+          "  return -1 // Element not found"
+        ],
+        cpp: `// C++ Implementation of Linear Search
+int linearSearch(int arr[], int n, int target) {
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == target) {
+            return i; // Target found at index i
+        }
+    }
+    return -1; // Target not present in array
+}`,
+        python: `# Python Implementation of Linear Search
+def linear_search(arr, target):
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i  # Return index of found element
+    return -1  # Return -1 if not found`,
+        java: `// Java Implementation of Linear Search
+public class LinearSearch {
+    public static int search(int[] arr, int target) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == target) {
+                return i; // Match found
+            }
+        }
+        return -1; // Not found
+    }
+}`,
+        js: `// JavaScript Implementation of Linear Search
+function linearSearch(arr, target) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === target) {
+            return i; // Found target at index i
+        }
+    }
+    return -1; // Target not in array
+}`
+      },
+
+      // 2. BINARY SEARCH
+      binary: {
+        id: "binary",
+        title: "Binary Search",
+        hindiNote: "(बाइनरी सर्च / द्विआधारी खोज)",
+        category: "Searching Algorithm",
+        subtitle: "Divides the sorted search interval in half repeatedly to locate the target in logarithmic time.",
+        definitionEn: "Binary Search is an ultra-fast searching algorithm that works STRICTLY on sorted arrays. It compares the target value to the middle element: if equal, it stops. If target is smaller, it eliminates the upper half; if larger, it eliminates the lower half.",
+        definitionHi: "बाइनरी सर्च केवल पहले से सॉर्ट (छोटे से बड़े क्रम) किए गए ऐरे पर ही काम करता है। यह हमेशा बिल्कुल बीच (Middle) वाले नंबर को देखता है। यदि टारगेट छोटा है, तो दाईं आधी लिस्ट तुरंत छोड़ दी जाती है। इससे हर कदम पर सर्च का दायरा आधा हो जाता है।",
+        exampleEn: "Looking up a word in an English dictionary. You open directly to the middle. If you see 'M' and your word is 'Elephant', you completely ignore the entire right half ('M' to 'Z') and continue only in the left half!",
+        exampleHi: "डिक्शनरी में कोई शब्द ढूँढना। आप सीधे बीच का पन्ना खोलते हैं। अगर बीच में 'M' आया और आपको 'Cat' ढूँढना है, तो आप तुरंत समझ जाते हैं कि शब्द बाईं तरफ ही होगा और दाईं तरफ के सैकड़ों पन्ने बिना पढ़े छोड़ देते हैं।",
+        steps: [
+          "Ensure the array is sorted in ascending order.",
+          "Initialize low = 0, high = n - 1.",
+          "Calculate middle index: mid = (low + high) / 2.",
+          "If arr[mid] == target, element is found! Return mid.",
+          "If target < arr[mid], search left half: high = mid - 1.",
+          "If target > arr[mid], search right half: low = mid + 1.",
+          "Repeat until low > high. If not found, return -1."
+        ],
+        best: "O(1)",
+        avg: "O(log n)",
+        worst: "O(log n)",
+        space: "O(1)",
+        stability: "N/A",
+        inPlace: "Yes",
+        paradigm: "Divide and Conquer",
+        whyComplexity: "Because the search space is cut in half at every single step (n/2, n/4, n/8...), the maximum steps needed is log₂(n).",
+        isSearch: true,
+        pseudo: [
+          "binarySearch(arr, target):",
+          "  low = 0, high = length(arr) - 1",
+          "  while low <= high:",
+          "    mid = floor((low + high) / 2)",
+          "    if arr[mid] == target: return mid",
+          "    else if arr[mid] < target: low = mid + 1",
+          "    else: high = mid - 1",
+          "  return -1"
+        ],
+        cpp: `// C++ Implementation of Binary Search
+int binarySearch(int arr[], int n, int target) {
+    int low = 0, high = n - 1;
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (arr[mid] == target) return mid;
+        if (arr[mid] < target) low = mid + 1; // Search right half
+        else high = mid - 1;                // Search left half
+    }
+    return -1; // Element absent
+}`,
+        python: `# Python Implementation of Binary Search
+def binary_search(arr, target):
+    low = 0
+    high = len(arr) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1`,
+        java: `// Java Implementation of Binary Search
+public class BinarySearch {
+    public static int search(int[] arr, int target) {
+        int low = 0, high = arr.length - 1;
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (arr[mid] == target) return mid;
+            if (arr[mid] < target) low = mid + 1;
+            else high = mid - 1;
+        }
+        return -1;
+    }
+}`,
+        js: `// JavaScript Implementation of Binary Search
+function binarySearch(arr, target) {
+    let low = 0, high = arr.length - 1;
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        if (arr[mid] === target) return mid;
+        if (arr[mid] < target) low = mid + 1;
+        else high = mid - 1;
+    }
+    return -1;
+}`
+      },
+
+      // 3. BUBBLE SORT
+      bubble: {
+        id: "bubble",
+        title: "Bubble Sort",
+        hindiNote: "(बबल सॉर्ट)",
+        category: "Sorting Algorithm",
+        subtitle: "Repeatedly steps through the list, swaps adjacent items that are in reverse order until sorted.",
+        definitionEn: "Bubble Sort is a comparison-based algorithm where neighboring pairs of elements are compared and swapped if they are out of order. In each pass, the largest unsorted element 'bubbles up' to its correct final place at the end of the array.",
+        definitionHi: "बबल सॉर्ट में हम एक तरफ से चलना शुरू करते हैं और साथ-साथ वाले (Adjacent) दोनों नंबरों की तुलना करते हैं। अगर पहला नंबर दूसरे से बड़ा है, तो दोनों को आपस में बदल (Swap) देते हैं। हर राउंड के बाद सबसे बड़ा नंबर बुलबुले की तरह तैरकर सबसे पीछे बैठ जाता है।",
+        exampleEn: "Arranging students in a morning school prayer assembly by height. The teacher walks through the row and tells any student who is taller than the classmate behind them to swap places. After round 1, the tallest student is at the end!",
+        exampleHi: "सुबह स्कूल की प्रार्थना लाइन में बच्चों को कद (Height) के हिसाब से लगाना। अगर आगे वाला बच्चा पीछे वाले से लंबा है, तो दोनों जगह बदल लेते हैं। एक राउंड के बाद सबसे लंबा बच्चा सबसे पीछे पहुँच जाता है।",
+        steps: [
+          "Loop i from 0 to n - 1 (passes).",
+          "Loop j from 0 to n - i - 2 (comparing neighbors).",
+          "If arr[j] > arr[j + 1], swap them.",
+          "Keep track of whether any swap occurred (swapped flag).",
+          "If no swaps happened in an entire pass, array is already sorted; terminate early!"
+        ],
+        best: "O(n)",
+        avg: "O(n²)",
+        worst: "O(n²)",
+        space: "O(1)",
+        stability: "Yes (Stable)",
+        inPlace: "Yes",
+        paradigm: "Comparison & Swap",
+        whyComplexity: "Best case is O(n) when array is already sorted and we stop after 1 pass. Average and worst is O(n²) because nested loops compare roughly n*(n-1)/2 pairs.",
+        isSearch: false,
+        pseudo: [
+          "bubbleSort(arr):",
+          "  for i = 0 to n - 1:",
+          "    swapped = false",
+          "    for j = 0 to n - i - 2:",
+          "      if arr[j] > arr[j + 1]:",
+          "        swap(arr[j], arr[j + 1])",
+          "        swapped = true",
+          "    if not swapped: break"
+        ],
+        cpp: `// C++ Implementation of Bubble Sort (Optimized)
+void bubbleSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        bool swapped = false;
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                std::swap(arr[j], arr[j + 1]);
+                swapped = true;
+            }
+        }
+        // If no two elements were swapped, break early
+        if (!swapped) break;
+    }
+}`,
+        python: `# Python Implementation of Bubble Sort
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n - 1):
+        swapped = False
+        for j in range(n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        if not swapped:
+            break
+    return arr`,
+        java: `// Java Implementation of Bubble Sort
+public class BubbleSort {
+    public static void sort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            boolean swapped = false;
+            for (int j = 0; j < n - i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+            if (!swapped) break;
+        }
+    }
+}`,
+        js: `// JavaScript Implementation of Bubble Sort
+function bubbleSort(arr) {
+    const n = arr.length;
+    for (let i = 0; i < n - 1; i++) {
+        let swapped = false;
+        for (let j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                swapped = true;
+            }
+        }
+        if (!swapped) break;
+    }
+    return arr;
+}`
+      },
+
+      // 4. SELECTION SORT
+      selection: {
+        id: "selection",
+        title: "Selection Sort",
+        hindiNote: "(सिलेक्शन सॉर्ट)",
+        category: "Sorting Algorithm",
+        subtitle: "Repeatedly finds the minimum element from the unsorted part and puts it at the beginning.",
+        definitionEn: "Selection Sort divides the array into two parts: a sorted part at the front and an unsorted part at the back. It repeatedly scans the entire unsorted part, finds the minimum element, and swaps it with the first element of the unsorted segment.",
+        definitionHi: "सिलेक्शन सॉर्ट ऐरे को दो हिस्सों में देखता है: आगे का सॉर्टेड और पीछे का अनसॉर्टेड। यह हर बार बचे हुए सभी नंबरों में से 'सबसे छोटा' (Minimum) नंबर ढूँढता है, और उसे उठाकर आगे खाली सही स्थान पर रख (Swap) देता है।",
+        exampleEn: "Picking the smallest apple from a fruit basket and placing it first in a new clean row. Then you find the smallest from the remaining apples and put it second. You repeat this until all apples are sorted.",
+        exampleHi: "टोकरी में रखे सेबों में से सबसे छोटा सेब ढूँढकर टेबल पर सबसे आगे रखना। फिर बाकी बचे सेबों में से सबसे छोटा चुनकर दूसरे नंबर पर रखना। यह क्रम तब तक चलता है जब तक सारे सेब साइज के अनुसार न लग जाएँ।",
+        steps: [
+          "Loop i from 0 to n - 1 (boundary of sorted region).",
+          "Assume minimum element is at index min_idx = i.",
+          "Loop j from i + 1 to n - 1: if arr[j] < arr[min_idx], set min_idx = j.",
+          "After scanning, if min_idx != i, swap arr[i] with arr[min_idx].",
+          "Repeat until the entire array is sorted."
+        ],
+        best: "O(n²)",
+        avg: "O(n²)",
+        worst: "O(n²)",
+        space: "O(1)",
+        stability: "No (Unstable)",
+        inPlace: "Yes",
+        paradigm: "Selection",
+        whyComplexity: "Selection sort ALWAYS scans the entire remaining unsorted segment to find the minimum, taking n*(n-1)/2 comparisons regardless of whether the array was already sorted.",
+        isSearch: false,
+        pseudo: [
+          "selectionSort(arr):",
+          "  for i = 0 to n - 1:",
+          "    minIdx = i",
+          "    for j = i + 1 to n - 1:",
+          "      if arr[j] < arr[minIdx]: minIdx = j",
+          "    if minIdx != i:",
+          "      swap(arr[i], arr[minIdx])"
+        ],
+        cpp: `// C++ Implementation of Selection Sort
+void selectionSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        int minIdx = i;
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIdx]) {
+                minIdx = j; // Update minimum index
+            }
+        }
+        if (minIdx != i) {
+            std::swap(arr[i], arr[minIdx]);
+        }
+    }
+}`,
+        python: `# Python Implementation of Selection Sort
+def selection_sort(arr):
+    n = len(arr)
+    for i in range(n - 1):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        if min_idx != i:
+            arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr`,
+        java: `// Java Implementation of Selection Sort
+public class SelectionSort {
+    public static void sort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            int minIdx = i;
+            for (int j = i + 1; j < n; j++) {
+                if (arr[j] < arr[minIdx]) {
+                    minIdx = j;
+                }
+            }
+            int temp = arr[i];
+            arr[i] = arr[minIdx];
+            arr[minIdx] = temp;
+        }
+    }
+}`,
+        js: `// JavaScript Implementation of Selection Sort
+function selectionSort(arr) {
+    const n = arr.length;
+    for (let i = 0; i < n - 1; i++) {
+        let minIdx = i;
+        for (let j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIdx]) minIdx = j;
+        }
+        if (minIdx !== i) {
+            [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+        }
+    }
+    return arr;
+}`
+      },
+
+      // 5. INSERTION SORT
+      insertion: {
+        id: "insertion",
+        title: "Insertion Sort",
+        hindiNote: "(इन्सर्शन सॉर्ट / सम्मिलित छँटाई - Note: often mistyped as 'intersection sort')",
+        category: "Sorting Algorithm",
+        subtitle: "Builds the sorted array one element at a time by inserting each element into its proper position.",
+        definitionEn: "Insertion Sort works similarly to the way you sort playing cards in your hand. The array is virtually split into a sorted and an unsorted part. Values from the unsorted part are picked and placed into the correct position in the sorted part by shifting larger elements.",
+        definitionHi: "इन्सर्शन सॉर्ट ठीक वैसे काम करता है जैसे हम हाथ में ताश (Playing Cards) के पत्ते सजाते हैं। हम एक-एक पत्ता उठाते हैं और पहले से जमे हुए पत्तों में सही जगह बनाने के लिए बड़े पत्तों को दाईं ओर खिसका कर नए पत्ते को उसकी सही जगह पर 'इन्सर्ट' (प्रविष्ट) कर देते हैं।",
+        exampleEn: "Arranging playing cards in your hands. When dealt a 7 of Spades, you compare it backwards against the 10 and 8 in your hand, sliding them rightward, then slide the 7 snugly right behind the 5.",
+        exampleHi: "ताश खेलते समय हाथ में आए पत्तों को क्रम से लगाना। अगर हाथ में 4, 8, 9 हैं और नया पत्ता 6 आया, तो आप 9 और 8 को थोड़ा दाईं तरफ सरकाते हैं और 6 को 4 के ठीक बाद घुसा देते हैं।",
+        steps: [
+          "Assume element at index 0 is already sorted.",
+          "Pick the next element from unsorted part: key = arr[i].",
+          "Compare key with elements in the sorted part (from right to left).",
+          "Shift all elements greater than key one position to the right.",
+          "Insert key into the correct vacant slot.",
+          "Repeat until array is sorted."
+        ],
+        best: "O(n)",
+        avg: "O(n²)",
+        worst: "O(n²)",
+        space: "O(1)",
+        stability: "Yes (Stable)",
+        inPlace: "Yes",
+        paradigm: "Incremental Insertion",
+        whyComplexity: "Best case is O(n) when array is already sorted because only 1 comparison is made per element with zero shifts. Worst case is O(n²) when array is in reverse order.",
+        isSearch: false,
+        pseudo: [
+          "insertionSort(arr):",
+          "  for i = 1 to n - 1:",
+          "    key = arr[i]; j = i - 1",
+          "    while j >= 0 and arr[j] > key:",
+          "      arr[j + 1] = arr[j] // Shift right",
+          "      j = j - 1",
+          "    arr[j + 1] = key // Insert key"
+        ],
+        cpp: `// C++ Implementation of Insertion Sort
+void insertionSort(int arr[], int n) {
+    for (int i = 1; i < n; i++) {
+        int key = arr[i];
+        int j = i - 1;
+        // Shift elements of arr[0..i-1] that are greater than key
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}`,
+        python: `# Python Implementation of Insertion Sort
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr`,
+        java: `// Java Implementation of Insertion Sort
+public class InsertionSort {
+    public static void sort(int[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            int key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+    }
+}`,
+        js: `// JavaScript Implementation of Insertion Sort
+function insertionSort(arr) {
+    for (let i = 1; i < arr.length; i++) {
+        let key = arr[i];
+        let j = i - 1;
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+    return arr;
+}`
+      },
+
+      // 6. QUICK SORT
+      quick: {
+        id: "quick",
+        title: "Quick Sort",
+        hindiNote: "(क्विक सॉर्ट / त्वरित छँटाई)",
+        category: "Sorting Algorithm",
+        subtitle: "Picks an element as pivot and partitions the array around it, sorting partitions recursively.",
+        definitionEn: "Quick Sort is an efficient divide-and-conquer algorithm. It selects a 'pivot' element and partitions the array so that all elements smaller than the pivot go to its left, and all elements larger go to its right. It then recursively sorts both halves.",
+        definitionHi: "क्विक सॉर्ट एक अत्यंत तेज़ 'डिवाइड एंड कॉन्कर' एल्गोरिदम है। इसमें एक संख्या को 'पिवट' (Pivot) चुना जाता है। फिर उससे छोटी सभी संख्याओं को उसके बाईं तरफ और बड़ी संख्याओं को दाईं तरफ रख दिया जाता है। इसके बाद दोनों तरफ के टुकड़ों को यही तरीका दोहराकर सॉर्ट किया जाता है।",
+        exampleEn: "Organizing students by age in an athletic club. The coach picks an arbitrary 18-year-old student as reference (pivot). All students under 18 stand on the left turf, all older than 18 stand on the right track. Then each group repeats the process!",
+        exampleHi: "दौड़ प्रतियोगिता में खिलाड़ियों को छांटना। कोच किसी 20 साल के खिलाड़ी को 'रेफरेंस' (Pivot) बना लेता है। 20 से कम उम्र वालों को बाईं तरफ और 20 से ज्यादा उम्र वालों को दाईं तरफ खड़ा कर दिया जाता है। फिर दोनों ग्रुप्स में यही काम दोहराया जाता है।",
+        steps: [
+          "Choose a pivot element (commonly the last element arr[high]).",
+          "Partition: Reorder array so elements < pivot are placed before it, and elements >= pivot after it.",
+          "Place pivot in its final sorted index.",
+          "Recursively apply Quick Sort to the left partition (arr[low .. p - 1]).",
+          "Recursively apply Quick Sort to the right partition (arr[p + 1 .. high])."
+        ],
+        best: "O(n log n)",
+        avg: "O(n log n)",
+        worst: "O(n²)",
+        space: "O(log n)",
+        stability: "No (Unstable)",
+        inPlace: "Yes",
+        paradigm: "Divide & Conquer",
+        whyComplexity: "When the pivot divides the array into two roughly equal halves, recursion depth is log(n) with O(n) work at each level = O(n log n). Worst case O(n²) occurs if the pivot chosen is always the smallest or largest element (e.g. already sorted array with last element as pivot).",
+        isSearch: false,
+        pseudo: [
+          "quickSort(arr, low, high):",
+          "  if low < high:",
+          "    p = partition(arr, low, high)",
+          "    quickSort(arr, low, p - 1)",
+          "    quickSort(arr, p + 1, high)",
+          "partition(arr, low, high):",
+          "  pivot = arr[high]; i = low - 1",
+          "  for j = low to high - 1:",
+          "    if arr[j] < pivot:",
+          "      i++; swap(arr[i], arr[j])",
+          "  swap(arr[i + 1], arr[high]); return i + 1"
+        ],
+        cpp: `// C++ Implementation of Quick Sort
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high]; // Choosing last element as pivot
+    int i = low - 1;
+    for (int j = low; j < high; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            std::swap(arr[i], arr[j]);
+        }
+    }
+    std::swap(arr[i + 1], arr[high]);
+    return i + 1; // Pivot index
+}
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}`,
+        python: `# Python Implementation of Quick Sort
+def quick_sort(arr, low, high):
+    if low < high:
+        pi = partition(arr, low, high)
+        quick_sort(arr, low, pi - 1)
+        quick_sort(arr, pi + 1, high)
+
+def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    for j in range(low, high):
+        if arr[j] < pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1`,
+        java: `// Java Implementation of Quick Sort
+public class QuickSort {
+    public static void sort(int[] arr, int low, int high) {
+        if (low < high) {
+            int pi = partition(arr, low, high);
+            sort(arr, low, pi - 1);
+            sort(arr, pi + 1, high);
+        }
+    }
+    private static int partition(int[] arr, int low, int high) {
+        int pivot = arr[high];
+        int i = low - 1;
+        for (int j = low; j < high; j++) {
+            if (arr[j] < pivot) {
+                i++;
+                int t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+            }
+        }
+        int t = arr[i + 1]; arr[i + 1] = arr[high]; arr[high] = t;
+        return i + 1;
+    }
+}`,
+        js: `// JavaScript Implementation of Quick Sort
+function quickSort(arr, low = 0, high = arr.length - 1) {
+    if (low < high) {
+        const pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+    return arr;
+}
+function partition(arr, low, high) {
+    const pivot = arr[high];
+    let i = low - 1;
+    for (let j = low; j < high; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+    return i + 1;
+}`
+      },
+
+      // 7. MERGE SORT
+      merge: {
+        id: "merge",
+        title: "Merge Sort",
+        hindiNote: "(मर्ज सॉर्ट / विलयन छँटाई)",
+        category: "Sorting Algorithm",
+        subtitle: "Divides the array into two halves, recursively sorts them, and merges the two sorted halves.",
+        definitionEn: "Merge Sort is a guaranteed O(n log n) divide-and-conquer algorithm. It continually divides the array into two halves until subarrays of size 1 remain. It then merges those sorted subarrays back together in ascending order.",
+        definitionHi: "मर्ज सॉर्ट एक अत्यंत भरोसेमंद एल्गोरिदम है जिसकी स्पीड हमेशा O(n log n) रहती है। यह ऐरे को बीच में से तब तक दो बराबर भागों में काटता रहता है जब तक कि सिर्फ एक-एक संख्या न बचे। फिर उन टुकड़ों को आपस में क्रमबद्ध तरीके से जोड़कर (Merge करके) पूरा ऐरे सॉर्ट कर देता है।",
+        exampleEn: "Sorting 1000 exam answer sheets alphabetically. Two teachers each take 500 sheets and sort their own pile. Combining two already-alphabetized piles into one big sorted pile is effortless: simply look at the top sheet of both piles and grab the smaller one!",
+        exampleHi: "बोर्ड परीक्षा की 1000 कॉपियों को रोल नंबर से लगाना। दो टीचर 500-500 कॉपियाँ लेकर अपने-अपने पास रोल नंबर से सजा लेते हैं। इसके बाद दोनों के पहले-पहले पर्चे को देखकर छोटी संख्या को एक मुख्य बंडल में रखना बेहद आसान और तेज़ हो जाता है!",
+        steps: [
+          "Divide: Calculate mid = (low + high) / 2 to split into two halves.",
+          "Conquer: Recursively sort the left subarray arr[low .. mid].",
+          "Conquer: Recursively sort the right subarray arr[mid + 1 .. high].",
+          "Combine: Merge the two sorted subarrays back into the original array.",
+          "Base Case: Stop splitting when sub-array length is 1."
+        ],
+        best: "O(n log n)",
+        avg: "O(n log n)",
+        worst: "O(n log n)",
+        space: "O(n)",
+        stability: "Yes (Stable)",
+        inPlace: "No (Requires Auxiliary Array)",
+        paradigm: "Divide & Conquer",
+        whyComplexity: "The array is divided into log₂(n) levels of recursion. At every level, merging elements takes O(n) time. Therefore, time complexity is ALWAYS O(n log n) in best, average, and worst cases.",
+        isSearch: false,
+        pseudo: [
+          "mergeSort(arr, l, r):",
+          "  if l < r:",
+          "    m = floor((l + r) / 2)",
+          "    mergeSort(arr, l, m)",
+          "    mergeSort(arr, m + 1, r)",
+          "    merge(arr, l, m, r)",
+          "merge(arr, l, m, r):",
+          "  merge 2 sorted subarrays into temp array",
+          "  copy temp back to arr[l..r]"
+        ],
+        cpp: `// C++ Implementation of Merge Sort
+void merge(int arr[], int l, int m, int r) {
+    int n1 = m - l + 1, n2 = r - m;
+    int L[n1], R[n2];
+    for (int i = 0; i < n1; i++) L[i] = arr[l + i];
+    for (int j = 0; j < n2; j++) R[j] = arr[m + 1 + j];
+    int i = 0, j = 0, k = l;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) arr[k++] = L[i++];
+        else arr[k++] = R[j++];
+    }
+    while (i < n1) arr[k++] = L[i++];
+    while (j < n2) arr[k++] = R[j++];
+}
+void mergeSort(int arr[], int l, int r) {
+    if (l < r) {
+        int m = l + (r - l) / 2;
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+        merge(arr, l, m, r);
+    }
+}`,
+        python: `# Python Implementation of Merge Sort
+def merge_sort(arr):
+    if len(arr) > 1:
+        mid = len(arr) // 2
+        L, R = arr[:mid], arr[mid:]
+        merge_sort(L)
+        merge_sort(R)
+        i = j = k = 0
+        while i < len(L) and j < len(R):
+            if L[i] <= R[j]:
+                arr[k] = L[i]; i += 1
+            else:
+                arr[k] = R[j]; j += 1
+            k += 1
+        while i < len(L):
+            arr[k] = L[i]; i += 1; k += 1
+        while j < len(R):
+            arr[k] = R[j]; j += 1; k += 1
+    return arr`,
+        java: `// Java Implementation of Merge Sort
+public class MergeSort {
+    public static void sort(int[] arr, int l, int r) {
+        if (l < r) {
+            int m = l + (r - l) / 2;
+            sort(arr, l, m);
+            sort(arr, m + 1, r);
+            merge(arr, l, m, r);
+        }
+    }
+    private static void merge(int[] arr, int l, int m, int r) {
+        int n1 = m - l + 1, n2 = r - m;
+        int[] L = new int[n1], R = new int[n2];
+        for (int i = 0; i < n1; i++) L[i] = arr[l + i];
+        for (int j = 0; j < n2; j++) R[j] = arr[m + 1 + j];
+        int i = 0, j = 0, k = l;
+        while (i < n1 && j < n2) {
+            if (L[i] <= R[j]) arr[k++] = L[i++];
+            else arr[k++] = R[j++];
+        }
+        while (i < n1) arr[k++] = L[i++];
+        while (j < n2) arr[k++] = R[j++];
+    }
+}`,
+        js: `// JavaScript Implementation of Merge Sort
+function mergeSort(arr) {
+    if (arr.length <= 1) return arr;
+    const mid = Math.floor(arr.length / 2);
+    const left = mergeSort(arr.slice(0, mid));
+    const right = mergeSort(arr.slice(mid));
+    return merge(left, right);
+}
+function merge(left, right) {
+    const res = [];
+    let i = 0, j = 0;
+    while (i < left.length && j < right.length) {
+        if (left[i] <= right[j]) res.push(left[i++]);
+        else res.push(right[j++]);
+    }
+    return res.concat(left.slice(i)).concat(right.slice(j));
+}`
+      }
+    };
+  </script>
+
+  <script>
+    const appState = {
+      currentAlgoKey: 'bubble',
+      currentLang: 'pseudo',
+      bilingual: true,
+      array: [],
+      size: 16,
+      speed: 120,
+      searchTarget: 42,
+      isRunning: false,
+      isPaused: false,
+      generator: null,
+      comparisons: 0,
+      swaps: 0,
+      accesses: 0,
+      startTime: 0,
+      timerInterval: null,
+      playTimeout: null
+    };
+
+    // DOM Elements Cache
+    const algoTitle = document.getElementById('algoTitle');
+    const algoHindiNote = document.getElementById('algoHindiNote');
+    const algoCategoryBadge = document.getElementById('algoCategoryBadge');
+    const algoSubtitle = document.getElementById('algoSubtitle');
+    const algoDefinitionEn = document.getElementById('algoDefinitionEn');
+    const algoDefinitionHiContainer = document.getElementById('algoDefinitionHiContainer');
+    const algoDefinitionHi = document.getElementById('algoDefinitionHi');
+    const algoExampleEn = document.getElementById('algoExampleEn');
+    const algoExampleHiContainer = document.getElementById('algoExampleHiContainer');
+    const algoExampleHi = document.getElementById('algoExampleHi');
+    const algoStepsList = document.getElementById('algoStepsList');
+    const algoWhyComplexity = document.getElementById('algoWhyComplexity');
+    const badgeBest = document.getElementById('badgeBest');
+    const badgeAvg = document.getElementById('badgeAvg');
+    const badgeWorst = document.getElementById('badgeWorst');
+    const badgeSpace = document.getElementById('badgeSpace');
+    const algoStability = document.getElementById('algoStability');
+    const algoInPlace = document.getElementById('algoInPlace');
+    const algoParadigm = document.getElementById('algoParadigm');
+
+    const visualizerCanvas = document.getElementById('visualizerCanvas');
+    const stepCommentary = document.getElementById('stepCommentary');
+    const completeBanner = document.getElementById('completeBanner');
+    const completeBannerText = document.getElementById('completeBannerText');
+    const metricComparisons = document.getElementById('metricComparisons');
+    const metricSwaps = document.getElementById('metricSwaps');
+    const metricSecondaryLabel = document.getElementById('metricSecondaryLabel');
+    const metricAccesses = document.getElementById('metricAccesses');
+    const metricTime = document.getElementById('metricTime');
+
+    const btnPlay = document.getElementById('btnPlay');
+    const playText = document.getElementById('playText');
+    const playIcon = document.getElementById('playIcon');
+    const btnStep = document.getElementById('btnStep');
+    const btnReset = document.getElementById('btnReset');
+    const btnRandomize = document.getElementById('btnRandomize');
+    const btnReversed = document.getElementById('btnReversed');
+    const btnNearlySorted = document.getElementById('btnNearlySorted');
+    const sliderArraySize = document.getElementById('sliderArraySize');
+    const labelArraySize = document.getElementById('labelArraySize');
+    const sliderSpeed = document.getElementById('sliderSpeed');
+    const labelSpeed = document.getElementById('labelSpeed');
+
+    const searchTargetBox = document.getElementById('searchTargetBox');
+    const inputSearchTarget = document.getElementById('inputSearchTarget');
+    const btnPickRandomTarget = document.getElementById('btnPickRandomTarget');
+    const inputCustomArray = document.getElementById('inputCustomArray');
+    const btnApplyCustomArray = document.getElementById('btnApplyCustomArray');
+    const codeDisplayArea = document.getElementById('codeDisplayArea');
+    const btnCopyCode = document.getElementById('btnCopyCode');
+    const copyBtnText = document.getElementById('copyBtnText');
+
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const soundDot = document.getElementById('soundDot');
+    const soundLabel = document.getElementById('soundLabel');
+    const langToggleBtn = document.getElementById('langToggleBtn');
+    const langModeText = document.getElementById('langModeText');
+
+    // Update Theory & Header Information based on current algorithm
+    function updateTheoryHeader() {
+      const data = ALGORITHMS_DATA[appState.currentAlgoKey];
+      algoTitle.innerText = data.title;
+      algoHindiNote.innerText = data.hindiNote;
+      algoCategoryBadge.innerText = data.category;
+      algoSubtitle.innerText = data.subtitle;
+      algoDefinitionEn.innerText = data.definitionEn;
+      algoDefinitionHi.innerText = data.definitionHi;
+      algoExampleEn.innerText = data.exampleEn;
+      algoExampleHi.innerText = data.exampleHi;
+      algoWhyComplexity.innerText = data.whyComplexity;
+
+      // Render Step-by-Step Logic
+      algoStepsList.innerHTML = '';
+      data.steps.forEach(step => {
+        const li = document.createElement('li');
+        li.innerText = step;
+        algoStepsList.appendChild(li);
+      });
+
+      badgeBest.innerText = data.best;
+      badgeAvg.innerText = data.avg;
+      badgeWorst.innerText = data.worst;
+      badgeSpace.innerText = data.space;
+
+      algoStability.innerText = data.stability;
+      algoInPlace.innerText = data.inPlace;
+      algoParadigm.innerText = data.paradigm;
+
+      // Adjust Hindi visibility based on bilingual toggle
+      if (appState.bilingual) {
+        algoDefinitionHiContainer.classList.remove('hidden');
+        algoExampleHiContainer.classList.remove('hidden');
+      } else {
+        algoDefinitionHiContainer.classList.add('hidden');
+        algoExampleHiContainer.classList.add('hidden');
+      }
+
+      if (data.isSearch) {
+        searchTargetBox.classList.remove('hidden');
+        searchTargetBox.classList.add('flex');
+        metricSecondaryLabel.innerHTML = `<i class="fa-solid fa-bullseye text-rose-400 text-[11px]"></i> Target Found At`;
+      } else {
+        searchTargetBox.classList.add('hidden');
+        searchTargetBox.classList.remove('flex');
+        metricSecondaryLabel.innerHTML = `<i class="fa-solid fa-right-left text-rose-400 text-[11px]"></i> Swaps / Writes`;
+      }
+
+      renderCodeDisplay();
+    }
+
+    // Render multi-language code snippets
+    function renderCodeDisplay() {
+      const data = ALGORITHMS_DATA[appState.currentAlgoKey];
+      codeDisplayArea.innerHTML = '';
+
+      if (appState.currentLang === 'pseudo') {
+        data.pseudo.forEach((line, idx) => {
+          const div = document.createElement('div');
+          div.id = `code-line-${idx}`;
+          div.className = 'px-2 py-0.5 rounded transition flex gap-3 text-[11px]';
+          div.innerHTML = `<span class="text-slate-600 select-none w-4 text-right font-mono">${idx + 1}</span><span class="text-slate-300 font-mono">${escapeHtml(line)}</span>`;
+          codeDisplayArea.appendChild(div);
+        });
+      } else {
+        const rawCode = data[appState.currentLang] || data.pseudo.join('\n');
+        const pre = document.createElement('pre');
+        pre.className = 'text-[11px] text-slate-200 font-mono overflow-x-auto';
+        pre.innerText = rawCode;
+        codeDisplayArea.appendChild(pre);
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function highlightPseudocode(lineIndex) {
+      if (appState.currentLang !== 'pseudo') return;
+      const lines = codeDisplayArea.querySelectorAll('div');
+      lines.forEach(l => l.classList.remove('code-active-step'));
+      const target = document.getElementById(`code-line-${lineIndex}`);
+      if (target) {
+        target.classList.add('code-active-step');
+      }
+    }
+
+    function resetArray(type = 'random', customValues = null) {
+      stopExecution();
+      appState.comparisons = 0;
+      appState.swaps = 0;
+      appState.accesses = 0;
+      updateStats(0);
+      completeBanner.classList.add('hidden');
+
+      const isSearch = ALGORITHMS_DATA[appState.currentAlgoKey].isSearch;
+      const size = appState.size;
+
+      if (customValues && Array.isArray(customValues)) {
+        appState.array = [...customValues];
+        appState.size = customValues.length;
+        sliderArraySize.value = appState.size;
+        labelArraySize.innerText = appState.size;
+      } else if (appState.currentAlgoKey === 'binary') {
+        // Binary search requires sorted array
+        appState.array = [];
+        let cur = Math.floor(Math.random() * 8) + 4;
+        for (let i = 0; i < size; i++) {
+          cur += Math.floor(Math.random() * 7) + 3;
+          appState.array.push(cur);
+        }
+      } else if (type === 'reversed') {
+        appState.array = [];
+        for (let i = 0; i < size; i++) {
+          appState.array.push(Math.round(95 - (i / size) * 82));
+        }
+      } else if (type === 'nearly') {
+        appState.array = [];
+        for (let i = 0; i < size; i++) {
+          appState.array.push(Math.round(10 + (i / size) * 80));
+        }
+        for (let k = 0; k < 2; k++) {
+          const i1 = Math.floor(Math.random() * size);
+          const i2 = Math.floor(Math.random() * size);
+          [appState.array[i1], appState.array[i2]] = [appState.array[i2], appState.array[i1]];
+        }
+      } else {
+        // Random
+        appState.array = [];
+        for (let i = 0; i < size; i++) {
+          appState.array.push(Math.floor(Math.random() * 86) + 12);
+        }
+      }
+
+      // Assign target if searching algorithm
+      if (isSearch) {
+        const randPick = appState.array[Math.floor(Math.random() * appState.array.length)];
+        appState.searchTarget = randPick;
+        inputSearchTarget.value = randPick;
+      }
+
+      stepCommentary.innerText = `Array ready (${type}). Press 'Start Visualize' or 'Step' to run ${ALGORITHMS_DATA[appState.currentAlgoKey].title}.`;
+      renderVisualizer();
+    }
+
+    function renderVisualizer(highlights = {}) {
+      visualizerCanvas.innerHTML = '';
+      const total = appState.array.length;
+      const isSearch = ALGORITHMS_DATA[appState.currentAlgoKey].isSearch;
+
+      if (isSearch) {
+        // Render Search Cards / Boxes with indices and pointer tags
+        visualizerCanvas.className = "flex-1 w-full flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 px-2 py-4 relative overflow-y-auto";
+
+        appState.array.forEach((val, idx) => {
+          const cardWrap = document.createElement('div');
+          cardWrap.className = 'flex flex-col items-center relative search-card-anim my-2';
+
+          // Pointer Tag Top (L, M, H, or Checked)
+          const tagBox = document.createElement('div');
+          tagBox.className = 'h-5 flex items-center justify-center mb-1';
+
+          if (appState.currentAlgoKey === 'binary') {
+            if (highlights.mid === idx) {
+              tagBox.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-purple-500 text-white font-mono text-[10px] font-bold glow-purple">MID</span>`;
+            } else if (highlights.low === idx) {
+              tagBox.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-amber-400 text-dark-950 font-mono text-[10px] font-bold glow-amber">LOW</span>`;
+            } else if (highlights.high === idx) {
+              tagBox.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-cyan-400 text-dark-950 font-mono text-[10px] font-bold glow-cyan">HIGH</span>`;
+            }
+          } else if (appState.currentAlgoKey === 'linear') {
+            if (highlights.comparing && highlights.comparing.includes(idx)) {
+              tagBox.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-amber-400 text-dark-950 font-mono text-[10px] font-bold glow-amber">SCAN</span>`;
+            }
+          }
+          cardWrap.appendChild(tagBox);
+
+          // Card Box
+          const box = document.createElement('div');
+          box.className = 'w-11 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center font-mono font-bold text-sm sm:text-base border shadow-md transition-all';
+
+          if (highlights.found === idx) {
+            box.className += ' bg-emerald-500 border-emerald-300 text-dark-950 glow-emerald scale-110';
+          } else if (highlights.comparing && highlights.comparing.includes(idx)) {
+            box.className += ' bg-amber-400 border-amber-300 text-dark-950 glow-amber scale-105';
+          } else if (highlights.mid === idx) {
+            box.className += ' bg-purple-600 border-purple-300 text-white glow-purple';
+          } else if (highlights.discarded && highlights.discarded.includes(idx)) {
+            box.className += ' bg-dark-850/40 border-dark-800 text-slate-600 opacity-20';
+          } else {
+            box.className += ' bg-dark-800 border-dark-700 text-cyan-300 hover:border-cyan-500';
+          }
+
+          box.innerText = val;
+          cardWrap.appendChild(box);
+
+          // Index Bottom Label
+          const idxLbl = document.createElement('span');
+          idxLbl.className = 'text-[10px] font-mono text-slate-500 mt-1 select-none';
+          idxLbl.innerText = `[${idx}]`;
+          cardWrap.appendChild(idxLbl);
+
+          visualizerCanvas.appendChild(cardWrap);
+        });
+
+      } else {
+        // Render Sorting Bars
+        visualizerCanvas.className = "flex-1 w-full flex items-end justify-center gap-1 px-1 py-2 overflow-hidden relative";
+
+        appState.array.forEach((val, idx) => {
+          const bar = document.createElement('div');
+          bar.className = 'bar-anim rounded-t-md flex-1 flex flex-col justify-end items-center relative';
+          
+          const maxVal = Math.max(...appState.array, 100);
+          const heightPercent = Math.max(12, (val / maxVal) * 94);
+          bar.style.height = `${heightPercent}%`;
+
+          // Color coded logic
+          if (highlights.found === idx || (highlights.sorted && highlights.sorted.includes(idx))) {
+            bar.className += ' bg-emerald-400 glow-emerald';
+          } else if (highlights.comparing && highlights.comparing.includes(idx)) {
+            bar.className += ' bg-amber-400 glow-amber';
+          } else if (highlights.swapping && highlights.swapping.includes(idx)) {
+            bar.className += ' bg-rose-500 glow-rose';
+          } else if (highlights.pivot === idx) {
+            bar.className += ' bg-purple-500 glow-purple';
+          } else {
+            bar.className += ' bg-cyan-500/80 hover:bg-cyan-400';
+          }
+
+          // Numeric label if space permits
+          if (total <= 28) {
+            const lbl = document.createElement('span');
+            lbl.className = 'text-[9px] font-mono text-slate-200 mb-1 select-none font-semibold';
+            lbl.innerText = val;
+            bar.appendChild(lbl);
+          }
+
+          visualizerCanvas.appendChild(bar);
+        });
+      }
+    }
+
+    function updateStats(elapsed = null) {
+      metricComparisons.innerText = appState.comparisons;
+      metricSwaps.innerText = appState.swaps;
+      metricAccesses.innerText = appState.accesses;
+      if (elapsed !== null) metricTime.innerText = `${elapsed}ms`;
+    }
+  </script>
+
+  <script>
+    // 1. LINEAR SEARCH GENERATOR
+    function* genLinearSearch(arr, target) {
+      highlightPseudocode(0);
+      stepCommentary.innerText = `Starting Linear Search for target: ${target}`;
+      yield {};
+
+      for (let i = 0; i < arr.length; i++) {
+        highlightPseudocode(1);
+        appState.comparisons++;
+        appState.accesses++;
+        soundSynth.playElementTone(arr[i]);
+        stepCommentary.innerText = `Index [${i}]: Comparing element ${arr[i]} == target ${target}`;
+        yield { comparing: [i] };
+
+        highlightPseudocode(2);
+        if (arr[i] === target) {
+          highlightPseudocode(3);
+          appState.swaps = `Index [${i}]`;
+          stepCommentary.innerText = `Success! Target ${target} found at index [${i}].`;
+          yield { found: i };
+          return;
+        }
+      }
+
+      highlightPseudocode(4);
+      appState.swaps = 'Not Found';
+      stepCommentary.innerText = `Linear Search ended: Target ${target} was not found in array.`;
+      yield { discarded: arr.map((_, idx) => idx) };
+    }
+
+    // 2. BINARY SEARCH GENERATOR
+    function* genBinarySearch(arr, target) {
+      highlightPseudocode(0);
+      let low = 0;
+      let high = arr.length - 1;
+      stepCommentary.innerText = `Binary Search: Target = ${target}. Initial sorted interval [${low} .. ${high}].`;
+      yield {};
+
+      while (low <= high) {
+        highlightPseudocode(1);
+        const mid = Math.floor((low + high) / 2);
+        highlightPseudocode(2);
+        appState.comparisons++;
+        appState.accesses++;
+        soundSynth.playElementTone(arr[mid]);
+
+        const discarded = [];
+        for (let i = 0; i < arr.length; i++) {
+          if (i < low || i > high) discarded.push(i);
+        }
+
+        stepCommentary.innerText = `Examining mid index [${mid}] with value ${arr[mid]}. Range: [${low} .. ${high}].`;
+        yield { mid, low, high, discarded };
+
+        highlightPseudocode(3);
+        if (arr[mid] === target) {
+          appState.swaps = `Index [${mid}]`;
+          stepCommentary.innerText = `Success! Target ${target} found at middle index [${mid}]!`;
+          yield { found: mid, discarded };
+          return;
+        } else if (arr[mid] < target) {
+          highlightPseudocode(4);
+          stepCommentary.innerText = `${arr[mid]} < ${target}: Target is in right half. Discarding left range. Low = ${mid + 1}.`;
+          low = mid + 1;
+        } else {
+          highlightPseudocode(5);
+          stepCommentary.innerText = `${arr[mid]} > ${target}: Target is in left half. Discarding right range. High = ${mid - 1}.`;
+          high = mid - 1;
+        }
+        yield { mid, low, high, discarded };
+      }
+
+      highlightPseudocode(6);
+      appState.swaps = 'Not Found';
+      stepCommentary.innerText = `Target ${target} does not exist in this array. (low > high)`;
+      yield { discarded: arr.map((_, i) => i) };
+    }
+
+    // 3. BUBBLE SORT GENERATOR
+    function* genBubbleSort(arr) {
+      const n = arr.length;
+      const sortedIndices = [];
+
+      for (let i = 0; i < n - 1; i++) {
+        let swapped = false;
+        highlightPseudocode(0);
+        stepCommentary.innerText = `Pass ${i + 1}: Floating the largest unsorted element towards the end.`;
+        yield { sorted: sortedIndices };
+
+        for (let j = 0; j < n - i - 1; j++) {
+          highlightPseudocode(3);
+          appState.comparisons++;
+          appState.accesses += 2;
+          soundSynth.playElementTone(arr[j]);
+          stepCommentary.innerText = `Comparing adjacent pair: arr[${j}]=${arr[j]} and arr[${j+1}]=${arr[j+1]}`;
+          yield { comparing: [j, j + 1], sorted: sortedIndices };
+
+          highlightPseudocode(4);
+          if (arr[j] > arr[j + 1]) {
+            highlightPseudocode(5);
+            appState.swaps++;
+            appState.accesses += 2;
+            [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+            soundSynth.playElementTone(arr[j + 1]);
+            stepCommentary.innerText = `Out of order! Swapped ${arr[j]} and ${arr[j + 1]}.`;
+            yield { swapping: [j, j + 1], sorted: sortedIndices };
+            swapped = true;
+          }
+        }
+        sortedIndices.push(n - i - 1);
+        highlightPseudocode(7);
+        if (!swapped) {
+          stepCommentary.innerText = `No swaps in this pass! Array is already fully sorted. Breaking early!`;
+          break;
+        }
+      }
+      yield { sorted: arr.map((_, i) => i) };
+    }
+
+    // 4. SELECTION SORT GENERATOR
+    function* genSelectionSort(arr) {
+      const n = arr.length;
+      const sortedIndices = [];
+
+      for (let i = 0; i < n - 1; i++) {
+        highlightPseudocode(1);
+        let minIdx = i;
+        stepCommentary.innerText = `Pass ${i + 1}: Searching for minimum element in unsorted range [${i} .. ${n - 1}].`;
+        yield { pivot: i, sorted: sortedIndices };
+
+        for (let j = i + 1; j < n; j++) {
+          highlightPseudocode(3);
+          appState.comparisons++;
+          appState.accesses += 2;
+          soundSynth.playElementTone(arr[j]);
+          stepCommentary.innerText = `Is arr[${j}]=${arr[j]} < current minimum arr[${minIdx}]=${arr[minIdx]}?`;
+          yield { comparing: [j, minIdx], pivot: i, sorted: sortedIndices };
+
+          highlightPseudocode(4);
+          if (arr[j] < arr[minIdx]) {
+            minIdx = j;
+            stepCommentary.innerText = `New minimum found: value ${arr[minIdx]} at index ${minIdx}!`;
+            yield { comparing: [j, minIdx], pivot: i, sorted: sortedIndices };
+          }
+        }
+
+        highlightPseudocode(5);
+        if (minIdx !== i) {
+          highlightPseudocode(6);
+          appState.swaps++;
+          appState.accesses += 2;
+          [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+          soundSynth.playElementTone(arr[i]);
+          stepCommentary.innerText = `Swapping minimum ${arr[i]} with arr[${i}] into sorted position.`;
+          yield { swapping: [i, minIdx], sorted: sortedIndices };
+        }
+        sortedIndices.push(i);
+      }
+      yield { sorted: arr.map((_, i) => i) };
+    }
+
+    // 5. INSERTION SORT GENERATOR
+    function* genInsertionSort(arr) {
+      const n = arr.length;
+      for (let i = 1; i < n; i++) {
+        highlightPseudocode(1);
+        const key = arr[i];
+        let j = i - 1;
+        appState.accesses++;
+        stepCommentary.innerText = `Selected key element: ${key} at index ${i}. Finding its slot in sorted prefix.`;
+        yield { pivot: i };
+
+        while (j >= 0) {
+          highlightPseudocode(3);
+          appState.comparisons++;
+          appState.accesses++;
+          soundSynth.playElementTone(arr[j]);
+          stepCommentary.innerText = `Comparing key ${key} with sorted predecessor arr[${j}]=${arr[j]}.`;
+          yield { comparing: [j, j + 1], pivot: i };
+
+          if (arr[j] > key) {
+            highlightPseudocode(4);
+            arr[j + 1] = arr[j];
+            appState.swaps++;
+            appState.accesses++;
+            stepCommentary.innerText = `${arr[j]} > ${key}: Shifting ${arr[j]} one position right to index ${j + 1}.`;
+            yield { swapping: [j, j + 1] };
+            j--;
+          } else {
+            break;
+          }
+        }
+        highlightPseudocode(6);
+        arr[j + 1] = key;
+        appState.accesses++;
+        stepCommentary.innerText = `Inserted key ${key} snugly into position index [${j + 1}].`;
+        yield { swapping: [j + 1] };
+      }
+      yield { sorted: arr.map((_, i) => i) };
+    }
+
+    // 6. QUICK SORT GENERATOR
+    function* genQuickSort(arr) {
+      function* partition(low, high) {
+        const pivot = arr[high];
+        appState.accesses++;
+        let i = low - 1;
+        stepCommentary.innerText = `Partitioning range [${low} .. ${high}] using pivot ${pivot} at index ${high}.`;
+        yield { pivot: high };
+
+        for (let j = low; j < high; j++) {
+          highlightPseudocode(7);
+          appState.comparisons++;
+          appState.accesses++;
+          soundSynth.playElementTone(arr[j]);
+          stepCommentary.innerText = `Comparing arr[${j}]=${arr[j]} with pivot ${pivot}.`;
+          yield { comparing: [j, high], pivot: high };
+
+          highlightPseudocode(8);
+          if (arr[j] < pivot) {
+            i++;
+            highlightPseudocode(9);
+            appState.swaps++;
+            appState.accesses += 2;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+            soundSynth.playElementTone(arr[i]);
+            stepCommentary.innerText = `${arr[i]} < ${pivot}: Moved to left partition (index ${i}).`;
+            yield { swapping: [i, j], pivot: high };
+          }
+        }
+
+        highlightPseudocode(10);
+        appState.swaps++;
+        appState.accesses += 2;
+        [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+        stepCommentary.innerText = `Placed pivot ${arr[i + 1]} into its final sorted position [${i + 1}].`;
+        yield { swapping: [i + 1, high] };
+        return i + 1;
+      }
+
+      function* sort(low, high) {
+        if (low < high) {
+          highlightPseudocode(1);
+          const p = yield* partition(low, high);
+          highlightPseudocode(3);
+          yield* sort(low, p - 1);
+          highlightPseudocode(4);
+          yield* sort(p + 1, high);
+        }
+      }
+
+      yield* sort(0, arr.length - 1);
+      yield { sorted: arr.map((_, i) => i) };
+    }
+
+    // 7. MERGE SORT GENERATOR
+    function* genMergeSort(arr) {
+      function* merge(l, m, r) {
+        const leftPart = arr.slice(l, m + 1);
+        const rightPart = arr.slice(m + 1, r + 1);
+        appState.accesses += (r - l + 1);
+        let i = 0, j = 0, k = l;
+
+        stepCommentary.innerText = `Merging sorted subarrays [${l} .. ${m}] and [${m + 1} .. ${r}].`;
+
+        while (i < leftPart.length && j < rightPart.length) {
+          appState.comparisons++;
+          soundSynth.playElementTone(leftPart[i]);
+          yield { comparing: [l + i, m + 1 + j] };
+
+          if (leftPart[i] <= rightPart[j]) {
+            arr[k] = leftPart[i];
+            i++;
+          } else {
+            arr[k] = rightPart[j];
+            j++;
+          }
+          appState.swaps++;
+          appState.accesses++;
+          stepCommentary.innerText = `Writing smaller element ${arr[k]} into index [${k}].`;
+          yield { swapping: [k] };
+          k++;
+        }
+
+        while (i < leftPart.length) {
+          arr[k] = leftPart[i];
+          appState.swaps++;
+          appState.accesses++;
+          yield { swapping: [k] };
+          i++; k++;
+        }
+
+        while (j < rightPart.length) {
+          arr[k] = rightPart[j];
+          appState.swaps++;
+          appState.accesses++;
+          yield { swapping: [k] };
+          j++; k++;
+        }
+      }
+
+      function* sort(l, r) {
+        if (l < r) {
+          const m = Math.floor((l + r) / 2);
+          highlightPseudocode(1);
+          yield* sort(l, m);
+          highlightPseudocode(3);
+          yield* sort(m + 1, r);
+          highlightPseudocode(5);
+          yield* merge(l, m, r);
+        }
+      }
+
+      yield* sort(0, arr.length - 1);
+      yield { sorted: arr.map((_, i) => i) };
+    }
+  </script>
+
+  <script>
+    function getAlgorithmGenerator() {
+      const key = appState.currentAlgoKey;
+      const target = parseInt(inputSearchTarget.value) || appState.searchTarget;
+
+      switch (key) {
+        case 'linear': return genLinearSearch(appState.array, target);
+        case 'binary': return genBinarySearch(appState.array, target);
+        case 'bubble': return genBubbleSort(appState.array);
+        case 'selection': return genSelectionSort(appState.array);
+        case 'insertion': return genInsertionSort(appState.array);
+        case 'quick': return genQuickSort(appState.array);
+        case 'merge': return genMergeSort(appState.array);
+        default: return genBubbleSort(appState.array);
+      }
+    }
+
+    function stepExecution() {
+      if (!appState.generator) {
+        appState.generator = getAlgorithmGenerator();
+      }
+
+      const res = appState.generator.next();
+      if (!res.done) {
+        renderVisualizer(res.value);
+        updateStats();
+        return true;
+      } else {
+        finishExecution();
+        return false;
+      }
+    }
+
+    function runLoop() {
+      if (!appState.isRunning) return;
+      const hasNext = stepExecution();
+      if (hasNext) {
+        appState.playTimeout = setTimeout(runLoop, appState.speed);
+      }
+    }
+
+    function startExecution() {
+      soundSynth.init();
+      appState.isRunning = true;
+      appState.isPaused = false;
+      playText.innerText = "Pause";
+      playIcon.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+      completeBanner.classList.add('hidden');
+
+      if (!appState.startTime) {
+        appState.startTime = Date.now();
+        appState.timerInterval = setInterval(() => {
+          const diff = Date.now() - appState.startTime;
+          updateStats(diff);
+        }, 60);
+      }
+
+      runLoop();
+    }
+
+    function pauseExecution() {
+      appState.isRunning = false;
+      appState.isPaused = true;
+      playText.innerText = "Resume";
+      playIcon.innerHTML = `<i class="fa-solid fa-play"></i>`;
+      clearTimeout(appState.playTimeout);
+    }
+
+    function stopExecution() {
+      appState.isRunning = false;
+      appState.isPaused = false;
+      clearTimeout(appState.playTimeout);
+      clearInterval(appState.timerInterval);
+      appState.startTime = 0;
+      appState.generator = null;
+      playText.innerText = "Start Visualize";
+      playIcon.innerHTML = `<i class="fa-solid fa-play"></i>`;
+    }
+
+    function finishExecution() {
+      stopExecution();
+      completeBanner.classList.remove('hidden');
+      completeBannerText.innerText = `${ALGORITHMS_DATA[appState.currentAlgoKey].title} Completed Successfully!`;
+      soundSynth.playSuccessChime();
+
+      if (!ALGORITHMS_DATA[appState.currentAlgoKey].isSearch) {
+        renderVisualizer({ sorted: appState.array.map((_, i) => i) });
+      }
+    }
+
+    // Pill Button Tab Switcher for the 7 Algorithms
+    document.querySelectorAll('.algo-pill-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.algo-pill-btn').forEach(b => {
+          b.className = 'algo-pill-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 transition';
+        });
+        e.currentTarget.className = 'algo-pill-btn px-3 py-1.5 rounded-lg bg-cyan-500 text-dark-950 font-bold shadow-md shadow-cyan-500/25 flex items-center gap-1.5 transition';
+        
+        appState.currentAlgoKey = e.currentTarget.dataset.algo;
+        updateTheoryHeader();
+        resetArray('random');
+      });
+    });
+
+    // Multi-Language Code Tab Switcher
+    document.querySelectorAll('.code-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.code-tab-btn').forEach(b => {
+          b.className = 'code-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white';
+        });
+        e.currentTarget.className = 'code-tab-btn px-2.5 py-1 rounded bg-cyan-500 text-dark-950 font-bold';
+        appState.currentLang = e.currentTarget.dataset.lang;
+        renderCodeDisplay();
+      });
+    });
+
+    // Copy Code Button Event
+    btnCopyCode.addEventListener('click', () => {
+      const data = ALGORITHMS_DATA[appState.currentAlgoKey];
+      const textToCopy = appState.currentLang === 'pseudo' ? data.pseudo.join('\n') : (data[appState.currentLang] || '');
+      
+      const tempArea = document.createElement('textarea');
+      tempArea.value = textToCopy;
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempArea);
+
+      copyBtnText.innerText = "Copied!";
+      setTimeout(() => {
+        copyBtnText.innerText = "Copy";
+      }, 1500);
+    });
+
+    // Control Button Listeners
+    btnPlay.addEventListener('click', () => {
+      if (appState.isRunning) pauseExecution();
+      else startExecution();
+    });
+
+    btnStep.addEventListener('click', () => {
+      if (appState.isRunning) pauseExecution();
+      stepExecution();
+    });
+
+    btnReset.addEventListener('click', () => resetArray('random'));
+    btnRandomize.addEventListener('click', () => resetArray('random'));
+    btnReversed.addEventListener('click', () => resetArray('reversed'));
+    btnNearlySorted.addEventListener('click', () => resetArray('nearly'));
+
+    sliderArraySize.addEventListener('input', (e) => {
+      appState.size = parseInt(e.target.value);
+      labelArraySize.innerText = appState.size;
+      resetArray('random');
+    });
+
+    sliderSpeed.addEventListener('input', (e) => {
+      appState.speed = parseInt(e.target.value);
+      labelSpeed.innerText = `${appState.speed}ms`;
+    });
+
+    btnPickRandomTarget.addEventListener('click', () => {
+      if (appState.array.length > 0) {
+        const randVal = appState.array[Math.floor(Math.random() * appState.array.length)];
+        inputSearchTarget.value = randVal;
+        appState.searchTarget = randVal;
+      }
+    });
+
+    btnApplyCustomArray.addEventListener('click', () => {
+      const raw = inputCustomArray.value.trim();
+      if (!raw) return;
+      const parsed = raw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0 && n <= 100);
+      if (parsed.length >= 4) {
+        resetArray('custom', parsed);
+      }
+    });
+
+    soundToggleBtn.addEventListener('click', () => {
+      soundSynth.enabled = !soundSynth.enabled;
+      if (soundSynth.enabled) {
+        soundLabel.innerText = "Sound: ON";
+        soundDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-ping";
+      } else {
+        soundLabel.innerText = "Sound: OFF";
+        soundDot.className = "w-2 h-2 rounded-full bg-slate-600";
+      }
+    });
+
+    langToggleBtn.addEventListener('click', () => {
+      appState.bilingual = !appState.bilingual;
+      if (appState.bilingual) {
+        langModeText.innerText = "Bilingual (हिन्दी + Eng)";
+      } else {
+        langModeText.innerText = "English Only";
+      }
+      updateTheoryHeader();
+    });
+
+    // Window Onload Initialization
+    window.onload = () => {
+      updateTheoryHeader();
+      resetArray('random');
+    };
+  </script>
+</body>
+</html>
